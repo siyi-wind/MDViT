@@ -11,6 +11,6 @@ Data
 
 2. Preprocessing
 Please run the following command to resize original images into the same dimension (512,512) and convert and store them as .npy files.
-'''sh
+```sh
 python Datasets/process_resize.py
-'''
+```
