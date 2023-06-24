@@ -1,0 +1,44 @@
+isic2018:
+  BASE: 'V5/ca_isic_fold4_FATNet_20221113_1155' 
+  BAT: 'V6/4_BAT34_nopre_isic2018_BAT_20230118_2329' 
+  SwinUNTER: 'V7/gra_4SwimUNTR_isic2018_SwimUNTR_20230103_2235' 
+  TransFuse: 'V8/4_isic2018_TransFuse_nopre_20230111_1505' 
+  UTNet: 'V9/ca_4_isic2018_UTNet_20230202_1303' 
+  SwinUnet: 'V10/gra_4SwinUnet_isic2018_SwinUnet_20230204_1212' 
+  MDViT: 'V4/ca_4detKT_nodetachMLPFM_SupDo_fold_FATNet_KT_adapt_20230101_1241'
+
+DMF:
+  BASE: 'V5/ca_DMF_fold4_FATNet_20221113_1705' 
+  BAT: 'V6/4_BAT34_nopre_DMF_BAT_20230119_1017' 
+  SwinUNTER: 'V7/gra_4SwimUNTR_DMF_SwimUNTR_20230103_2239' 
+  TransFuse: 'V8/4_DMF_nopre_TransFuse_20230111_1951' 
+  UTNet: 'V9/ca_4_DMF_UTNet_20230202_0239' 
+  SwinUnet: 'V10/gra_4SwinUnet_DMF_SwinUnet_20230204_0442' 
+  MDViT: 'V4/ca_4detKT_nodetachMLPFM_SupDo_fold_FATNet_KT_adapt_20230101_1241'
+
+SKD:
+  BASE: 'V5/ca_SKD_fold4_FATNet_20221113_1716' 
+  BAT: 'V6/4_BAT34_nopre_SKD_BAT_20230119_0108' 
+  SwinUNTER: 'V7/gra_4SwimUNTR_SKD_SwimUNTR_20230103_2242' 
+  TransFuse: 'V8/4_SKD_nopre_TransFuse_20230111_1951' 
+  UTNet: 'V9/ca_4_SKD_UTNet_20230201_1755' 
+  SwinUnet: 'V10/gra_4SwinUnet_SKD_SwinUnet_20230203_2327' 
+  MDViT: 'V4/ca_4detKT_nodetachMLPFM_SupDo_fold_FATNet_KT_adapt_20230101_1241'
+
+PH2:
+  BASE: 'V5/ca_PH2_fold4_FATNet_20221113_1654' 
+  BAT: 'V6/4_BAT34_nopre_PH2_BAT_20230118_2329' 
+  SwinUNTER: 'V7/gra_4SwimUNTR_PH2_SwimUNTR_20230103_2237' 
+  TransFuse: 'V8/4_PH2_nopre_TransFuse_20230111_1951' 
+  UTNet: 'V9/ca_4_PH2_UTNet_20230201_1755' 
+  SwinUnet: 'V10/gra_4SwinUnet_PH2_SwinUnet_20230203_2311' 
+  MDViT: 'V4/ca_4detKT_nodetachMLPFM_SupDo_fold_FATNet_KT_adapt_20230101_1241'
+
+JT:
+  BASE: 'V5/ca_four_fold4_FATNet_20221111_1917' 
+  BAT: 'V6/4_BAT34_nopre_four_BAT_20230124_1018' 
+  SwinUNTER: 'V7/gra_4SwimUNTR_four_SwimUNTR_20230105_0316' 
+  TransFuse: 'V8/4_four_nopre_TransFuse_20230111_2044' 
+  UTNet: 'V9/ca_4_four_UTNet_20230203_1503' 
+  SwinUnet: 'V10/gra_4SwinUnet_four_SwinUnet_20230205_1457' 
+  MDViT: 'V4/ca_4detKT_nodetachMLPFM_SupDo_fold_FATNet_KT_adapt_20230101_1241'

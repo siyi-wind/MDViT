@@ -1,0 +1,50 @@
+name: 'Experiment on local machine'
+# include code and results folders
+root_dir: '/ubc/ece/home/ra/grads/siyi/Research/skin_lesion_segmentation'
+pretrained_folder: '/bigdata/siyiplace/data/skin_lesion'
+device: 'cuda'
+# True only train, test one batch
+debug: True
+data:
+  # ['isic2018', 'PH2', 'DMF', 'SKD']
+  name: ['isic2018', 'PH2', 'DMF', 'SKD']
+  data_folder: '/bigdata/siyiplace/data/skin_lesion'
+  k_fold: '4'
+  split_ratio: [0.8, 0.2]
+  use_val: False  # if false, combine train and val sets to train
+  train_aug: True
+  img_size: 224
+train:
+  num_workers: 6
+  num_epochs: 200
+  num_iters: False # num of updating for each epoch
+  # batch_size uses args to define
+  optimizer:
+    mode: 'adamw'
+    adamw:
+      lr: '1e-4'
+      betas: 
+        - 0.9
+        - 0.999
+      eps: '1e-8'
+      weight_decay: 0.05
+    adam:
+      lr: '1e-4'
+      betas:
+        - 0.9
+        - 0.999
+test:
+  only_test: False  # if True, only do test
+  test_model_dir: '/ubc/ece/home/ra/grads/siyi/Research/skin_lesion_segmentation/results/ISICW/C_results/C65/ca_4base_isic2018_ViTSeg_20230430_1655/best.pth'
+  num_workers: 6
+  batch_size: 5
+# model uses args to define
+# resnet[18,34,50,101]
+model_encoder_id: 0
+model_adapt:
+  adapt_method: False
+  Sup_label: 'Domain'
+  use_one_hot: True  # if True use one hot label, else use weights
+  num_domains: 1
+kt:
+  ensemble_method: 'att'
