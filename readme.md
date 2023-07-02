@@ -1,6 +1,7 @@
 # MDViT: Multi-domain Vision Transformer for Small Medical Image Segmentation Datasets
 
-![alt text](Images/model_architecture.png){:height="50%" width="50%"}
+<!-- ![alt text](Images/model_architecture.png) -->
+<img src="Images/model_architecture.png" width="70%">
 <p align="center">Overall architecture of MDViT, which is trained on multi-domain data by optimizing two types of losses: $L_{seg}$ and $L_{mkd}$. MDViT extends BASE (a) with DA inside factorized MHSA (b), which is detailed in (c), and MKD (d).</p>
 
 This is a PyTorch implementation for [MDViT: Multi-domain Vision Transformer for Small Medical Image Segmentation Datasets, MICCAI 2023][7].
