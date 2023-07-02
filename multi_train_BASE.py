@@ -70,7 +70,7 @@ def main(config):
         from Models.Transformer.base import BASE_DSN
         model = BASE_DSN(img_size=config.data.img_size, drop_rate=0.1, drop_path_rate=0.1,
         conv_norm=nn.BatchNorm2d, adapt_method=config.model_adapt.adapt_method, num_domains=K)
-    elif config.model == 'SwimUNTR':
+    elif config.model == 'SwimUNETR':
         from monai.networks.nets import SwinUNETR
         model = SwinUNETR(img_size=(256,256), in_channels=3, out_channels=1, feature_size=48, use_checkpoint=False, spatial_dims=2)
     elif config.model == 'BASE_DASE':

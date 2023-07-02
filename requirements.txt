@@ -4,7 +4,6 @@ pyyaml
 medpy
 albumentations
 timm
-fvcore
 monai
 thop
 matplotlib
