@@ -16,7 +16,7 @@ from torch import nn, einsum
 
 import sys
 import math
-sys.path.append('/ubc/ece/home/ra/grads/siyi/Research/skin_lesion_segmentation/skin-lesion-segmentation-transformer/')
+sys.path.append('/ubc/ece/home/ra/grads/siyi/Research/skin_lesion_segmentation/MDViT/')
 from Utils.pieces import load_pretrain
 from Models.Decoders import UnetDecodingBlock
 

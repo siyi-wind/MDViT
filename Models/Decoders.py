@@ -8,7 +8,7 @@ import torch.nn as nn
 import math
 from einops import rearrange
 import sys
-sys.path.append('/ubc/ece/home/ra/grads/siyi/Research/skin_lesion_segmentation/skin-lesion-segmentation-transformer/')
+sys.path.append('/ubc/ece/home/ra/grads/siyi/Research/skin_lesion_segmentation/MDViT/')
 from Utils._deeplab import ASPP
 
 
@@ -116,119 +116,6 @@ class DWConv2d_BN_M(nn.Module):
         x = self.act(x)
 
         return x
-
-
-
-class UnetDecodingBlock(nn.Module):
-    def __init__(self, in_channel, out_channel, use_res=False, conv_norm=nn.BatchNorm2d):
-        '''
-        upsample and conv input, concat with skip from encoder
-        then conv this combination
-        use_res: True means to use residual block for conv_after
-        '''
-        super(UnetDecodingBlock, self).__init__()
-        self.use_res = use_res
-        self.conv_before = nn.Conv2d(in_channel, out_channel, kernel_size=1)
-        # conv after cat
-        if out_channel>512:
-            kernel_size,padding = 1,0
-        else:
-            kernel_size,padding = 3,1
-        self.conv_after = nn.Sequential(
-            nn.Conv2d(out_channel*2,out_channel,kernel_size=kernel_size,stride=1,padding=padding),
-            conv_norm(out_channel),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(out_channel,out_channel,kernel_size=kernel_size,stride=1,padding=padding),
-            conv_norm(out_channel),
-            nn.ReLU(inplace=True)
-        )
-
-        if self.use_res:
-            self.res_conv = nn.Sequential(
-                nn.Conv2d(out_channel*2, out_channel, kernel_size=1, stride=1),
-                conv_norm(out_channel)
-            )
-    
-    def forward(self, input, skip):
-        skip_size = skip.size()[2:]
-        out = nn.functional.interpolate(input,size = skip_size,mode = 'bilinear', align_corners=False)
-        out = self.conv_before(out)
-        out = torch.cat((skip,out),dim=1)
-        if self.use_res:
-            return self.res_conv(out) + self.conv_after(out)
-        else:
-            return self.conv_after(out)
-
-
-class UnetDecodingBlock_M(nn.Module):
-    def __init__(self, in_channel, out_channel, use_res=False, conv_norm=nn.BatchNorm2d, num_domains=1):
-        '''
-        upsample and conv input, concat with skip from encoder
-        then conv this combination
-        use_res: True means to use residual block for conv_after
-        '''
-        super(UnetDecodingBlock_M, self).__init__()
-        self.use_res = use_res
-        self.conv_before = nn.Conv2d(in_channel, out_channel, kernel_size=1)
-        # conv after cat
-        if out_channel>512:
-            kernel_size,padding = 1,0
-        else:
-            kernel_size,padding = 3,1
-
-        self.conv_after_conv1 = nn.Conv2d(out_channel*2,out_channel,kernel_size=kernel_size,stride=1,padding=padding)
-        self.conv_after_norm1 = nn.ModuleList([conv_norm(out_channel) for _ in range(num_domains)])
-        self.conv_after_act1 = nn.ReLU(inplace=True)
-        self.conv_after_conv2 = nn.Conv2d(out_channel,out_channel,kernel_size=kernel_size,stride=1,padding=padding)
-        self.conv_after_norm2 = nn.ModuleList([conv_norm(out_channel) for _ in range(num_domains)])
-        self.conv_after_act2 = nn.ReLU(inplace=True)
-
-        if self.use_res:
-            self.res_conv_conv1 = nn.Conv2d(out_channel*2, out_channel, kernel_size=1, stride=1),
-            self.res_conv_norm1 = nn.ModuleList([conv_norm(out_channel) for _ in range(num_domains)])
-    
-    def forward(self, input, skip, d):
-        skip_size = skip.size()[2:]
-        int_d = int(d)
-        out = nn.functional.interpolate(input,size = skip_size,mode = 'bilinear', align_corners=False)
-        out = self.conv_before(out)
-        out = torch.cat((skip,out),dim=1)
-        x = self.conv_after_conv1(out)
-        x = self.conv_after_norm1[int_d](x)
-        x = self.conv_after_act1(x)
-        x = self.conv_after_conv2(x)
-        x = self.conv_after_norm2[int_d](x)
-        x = self.conv_after_act2(x)
-        if self.use_res:
-            return self.res_conv_norm1[int_d](self.res_conv_conv1(out)) + x
-        else:
-            return x
-
-
-class ResidualDecodingBlock(nn.Module):
-    def __init__(self,in_channels,out_channels):
-        super().__init__()
-        self.before_conv = nn.Conv2d(in_channels,out_channels,1,1)
-        self.conv_after = nn.Sequential(
-                        nn.Conv2d(out_channels*2,out_channels//2,1,1),
-                        nn.BatchNorm2d(out_channels//2),
-                        nn.ReLU(inplace=True),
-                        nn.Conv2d(out_channels//2,out_channels//2,3,1,1),
-                        nn.BatchNorm2d(out_channels//2),
-                        nn.ReLU(inplace=True),
-                        nn.Conv2d(out_channels//2,out_channels,1,1,),
-                        nn.BatchNorm2d(out_channels),
-                        nn.ReLU(inplace=True),
-        )
-        self.skip = nn.Conv2d(out_channels*2,out_channels,1,1)
-    
-    def forward(self,input,skip,d=None):
-        skip_size = skip.size()[2:]
-        out = nn.functional.interpolate(input,size = skip_size,mode = 'bilinear', align_corners=False)
-        out = self.before_conv(out)
-        out = torch.cat((skip,out),dim=1)
-        return self.conv_after(out)+self.skip(out)
-        
 
 
 class UnetDecodingBlockTransformer_M(nn.Module):
@@ -372,8 +259,6 @@ class MLPDecoder(nn.Module):
             self.linear_out = nn.Conv2d(hidden_channel, out_channel, 1)
         self.avg_pool = nn.AdaptiveAvgPool2d((1,1))
         
-
-
     def forward(self, features, img_size, out_feat=False):
         x1, x2, x3, x4 = features   # (B,C,H,W)  H/4, H/8, H/16, H/32
         h, w = x1.shape[2:]
@@ -399,7 +284,6 @@ class MLPDecoder(nn.Module):
         out = self.linear_out(out)
    
         return {'seg':out, 'feat':feat} if out_feat else out
-
 
 
 class MLPDecoderFM(nn.Module):
@@ -456,24 +340,13 @@ class MLPDecoderFM(nn.Module):
 
 
 if __name__ == '__main__':
-    # mhsa_block = nn.Identity()
-    # net = UnetDecodingBlockTransformer(640, 256, mhsa_block, use_res=False, conv_norm=nn.InstanceNorm2d)
-    # x, skip = torch.randn(5, 640, 16, 16), torch.randn(5, 256, 32, 32)
-    # y = net(x, skip)
-    # print(y.shape)
-
-    # net = MLPDecoderFM([64,128,320,512],1,hidden_channel=512)
-    # x1 = torch.randn(5,512,8,8)
-    # x2 = torch.randn(5,320,16,16)
-    # x3 = torch.randn(5,128,32,32)
-    # x4 = torch.randn(5,64,64,64)
-    # x5 = torch.randn(5,64,64,64)
-    # y = net([x4,x3,x2,x1,x5], (256,256))
-
-    net = ResidualDecodingBlock(512,256)
-    x = torch.randn(5, 512, 8, 8)
-    skip = torch.randn(5,256,16,16)
-    y = net(x, skip)
+    net = MLPDecoderFM([64,128,320,512],1,hidden_channel=512)
+    x1 = torch.randn(5,512,8,8)
+    x2 = torch.randn(5,320,16,16)
+    x3 = torch.randn(5,128,32,32)
+    x4 = torch.randn(5,64,64,64)
+    x5 = torch.randn(5,64,64,64)
+    y = net([x4,x3,x2,x1,x5], (256,256))
 
     print(y.shape)
     total_trainable_params = sum(

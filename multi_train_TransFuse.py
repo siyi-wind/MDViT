@@ -23,14 +23,8 @@ from Datasets.create_dataset import Dataset_wrap, SkinDataset, norm01, Dataset_w
 from Utils.losses import dice_loss
 from Utils.pieces import DotDict
 
-# SEED=42
-# torch.manual_seed(SEED)
-# torch.backends.cudnn.deterministic = True
-# torch.backends.cudnn.benchmark = False
-# np.random.seed(SEED)
-# random.seed(SEED)
-torch.cuda.empty_cache()
 
+torch.cuda.empty_cache()
 
 def structure_loss(pred, mask):
     weit = 1 + 5*torch.abs(F.avg_pool2d(mask, kernel_size=31, stride=1, padding=15) - mask)
@@ -85,85 +79,13 @@ def main(config):
 
     
     # prepare model
-    if config.model == 'DeepResUnet':
-        from Models.CNN.Deep_ResUnet import DeepResUnet
-        model = DeepResUnet(pretrained=True, encoder_id=config.model_encoder_id)
-    elif config.model == 'ResUnet':
-        from monai.networks.nets import UNet
-        model = UNet(spatial_dims=2, in_channels=3, out_channels=1, channels=(64,128,320,512,1024), strides=(2,2,2,2), num_res_units=2)
-    elif config.model == 'AttentionUnet':
-        from monai.networks.nets import AttentionUnet
-        model = AttentionUnet(spatial_dims=2, in_channels=3, out_channels=1, channels=(64,128,256,512,1024), strides=(2,2,2,2))
-    elif config.model == 'DeepRUT':
-        from Models.Hybrid_models.Deep_RUT import DeepRUT
-        model = DeepRUT(pretrained=True, encoder_id=config.model_encoder_id)
-    elif config.model == 'DeepRUST':
-        from Models.Hybrid_models.Deep_RUST import DeepRUST
-        model = DeepRUST(pretrained=True, encoder_id=config.model_encoder_id,select_patch=config.select_patch)
-    elif config.model == 'ViTSeg':
-        from Models.Transformer.Vit import ViTSeg
-        model = ViTSeg(img_size=config.data.img_size,drop_rate=0.1)
-    elif config.model == 'ViTSeg_adapt':
-        from Models.Transformer.Vit import ViTSeg_adapt
-        model = ViTSeg_adapt(img_size=config.data.img_size,drop_rate=0.1,adapt_method=config.model_adapt.adapt_method, num_domains=K)
-    elif config.model == 'UFAT':
-        from Models.Transformer.UFAT import UFAT
-        # model = UFAT(drop_rate=0.1, drop_path_rate=0.1, conv_norm=nn.BatchNorm2d)
-        model = UFAT(drop_rate=0.1, drop_path_rate=0.1, conv_norm=nn.BatchNorm2d)
-    elif config.model == 'UFAT_adapt':
-        from Models.Transformer.UFAT_for_adapt import UFAT_adapt
-        model = UFAT_adapt(img_size=config.data.img_size, drop_rate=0.1, drop_path_rate=0.1, 
-        conv_norm=nn.BatchNorm2d, adapt_method=config.model_adapt.adapt_method, num_domains=K)
-    elif config.model == 'FATNet':
-        from Models.Transformer.UFAT import FATNet
-        model = FATNet(drop_rate=0.1, drop_path_rate=0.1, conv_norm=nn.BatchNorm2d)
-    elif config.model == 'FATNet_adapt':
-        from Models.Transformer.UFAT_for_adapt import FATNet_adapt
-        model = FATNet_adapt(img_size=config.data.img_size, drop_rate=0.1, drop_path_rate=0.1,
-        conv_norm=nn.BatchNorm2d, adapt_method=config.model_adapt.adapt_method, num_domains=K)
-    elif config.model == 'CoaTSeg':
-        from Models.Transformer.coat import CoaTSeg
-        model = CoaTSeg(pretrained=True, drop_rate=0.1, drop_path_rate=0.1)
-    elif config.model == 'CANet':
-        from Models.CNN.CANet.networks.network import Comprehensive_Atten_Unet
-        model = Comprehensive_Atten_Unet(img_size=config.data.img_size,n_classes=1)
-    elif config.model == 'SwimUNTR':
-        from monai.networks.nets import SwinUNETR
-        model = SwinUNETR(img_size=(256,256), in_channels=3, out_channels=1, feature_size=48, use_checkpoint=False, spatial_dims=2)
-    elif config.model == 'FATSegmenter':
-        from Models.Transformer.UFAT import FATSegmenter
-        model = FATSegmenter(drop_rate=0.1, drop_path_rate=0.1, conv_norm=nn.BatchNorm2d, decoder_name='MLP')
-    elif config.model == 'TransFuse':
+
+    if config.model == 'TransFuse':
         from Models.Hybrid_models.TransFuseFolder.TransFuse import TransFuse_L
         model = TransFuse_L(pretrained=True, pretrained_folder=config.pretrained_folder)
     elif config.model == 'TransFuse_adapt':
         from Models.Hybrid_models.TransFuseFolder.TransFuse import TransFuse_S_adapt
         model = TransFuse_S_adapt(pretrained=False, pretrained_folder=config.pretrained_folder, num_domains=K)
-    elif config.model == 'TransFuse_newadapt':
-        from Models.Hybrid_models.TransFuseFolder.TransFuse import TransFuse_L_newadapt
-        model = TransFuse_L_newadapt(pretrained=True,pretrained_folder=config.pretrained_folder)
-        for name, param in model.transformer.named_parameters():
-            if 'adapter' not in name and 'norm' not in name:
-                param.requires_grad = False 
-    elif config.model == 'TransFuse_newadapt2':
-        from Models.Hybrid_models.TransFuseFolder.TransFuse import TransFuse_L_newadapt2
-        model = TransFuse_L_newadapt2(pretrained=True,pretrained_folder=config.pretrained_folder,
-                                    adapt_method=config.model_adapt.adapt_method)
-        for name, param in model.transformer.named_parameters():
-            if 'adapter' not in name and 'norm' not in name:
-                param.requires_grad = False 
-        for name, param in model.resnet.named_parameters():
-            if 'adapter' not in name and 'norm' not in name:
-                param.requires_grad = False        
-    elif config.model == 'FATNet_DASE':
-        from Models.Sota_adapters.UFAT_sota_adapt import FATNet_DASE
-        model = FATNet_DASE(drop_rate=0.1, drop_path_rate=0.1, conv_norm=nn.BatchNorm2d)
-    elif config.model == 'FATNet_USE':
-        from Models.Sota_adapters.UFAT_sota_adapt import FATNet_USE
-        model =  FATNet_USE(drop_rate=0.1, drop_path_rate=0.1, conv_norm=nn.BatchNorm2d)
-    elif config.model == 'ResUnet_adapt':
-        from Models.Sota_adapters.ResUnet_sota_adapt import ResUnet_adapt
-        model = ResUnet_adapt(num_domains=K,adapt_method=config.model_adapt.adapt_method)
     total_trainable_params = sum(
                     p.numel() for p in model.parameters() if p.requires_grad)
     total_params = sum(p.numel() for p in model.parameters())
@@ -237,25 +159,13 @@ def train_val(config, model, train_loaders, val_loaders, criterion):
                 domain_label = batch['set_id']
                 d = str(domain_label[0].item())
                 domain_label = torch.nn.functional.one_hot(domain_label, 4).float().cuda()
-                DC_label = batch['DC_id']
-                DC_label = torch.nn.functional.one_hot(DC_label, 15).float().cuda()
                 if config.model_adapt.adapt_method and 'Sup' in config.model_adapt.adapt_method:
-                    if config.model_adapt.Sup_label == 'DC':
-                        output = model(img, DC_label)
-                    elif config.model_adapt.Sup_label == 'Domain':
+                    if config.model_adapt.Sup_label == 'Domain':
                         lateral_map_4, lateral_map_3, lateral_map_2 = model(img, domain_label)
-                elif config.model_adapt.adapt_method in ['series_adapters', 'parallel_adapters', 'DASE']:
-                    output = model(img,d)
                 else:
                      lateral_map_4, lateral_map_3, lateral_map_2 = model(img)
                 output = torch.sigmoid(lateral_map_2)
     
-                # calculate loss
-                # assert (output.shape == label.shape)
-                # losses = []
-                # for function in criterion:
-                #     losses.append(function(output, label))
-                # loss = sum(losses)
                 loss4 = structure_loss(lateral_map_4, label)
                 loss3 = structure_loss(lateral_map_3, label)
                 loss2 = structure_loss(lateral_map_2, label) 
@@ -322,27 +232,16 @@ def train_val(config, model, train_loaders, val_loaders, criterion):
                 domain_label = batch['set_id']
                 d = str(domain_label[0].item())
                 domain_label = torch.nn.functional.one_hot(domain_label, 4).float().cuda()
-                DC_label = batch['DC_id']
-                DC_label = torch.nn.functional.one_hot(DC_label, 15).float().cuda()
                 batch_len = img.shape[0]
 
                 with torch.no_grad():
                     if config.model_adapt.adapt_method and 'Sup' in config.model_adapt.adapt_method:
-                        if config.model_adapt.Sup_label == 'DC':
-                            output = model(img, DC_label)
-                        elif config.model_adapt.Sup_label == 'Domain':
+                        if config.model_adapt.Sup_label == 'Domain':
                             _, _, res = model(img, domain_label)
-                    elif config.model_adapt.adapt_method in ['series_adapters', 'parallel_adapters', 'DASE']:
-                        output = model(img,d)
                     else:
                         _, _, res = model(img)
                     output = torch.sigmoid(res)
 
-                    # calculate loss
-                    # assert (output.shape == label.shape)
-                    # losses = []
-                    # for function in criterion:
-                    #     losses.append(function(output, label))
                     loss = criterion(res, label)
                     loss_val_sum += loss*batch_len
 
@@ -424,26 +323,15 @@ def test(config, model, model_dir, test_loaders, criterion):
             domain_label = batch['set_id']
             d = str(domain_label[0].item())
             domain_label = torch.nn.functional.one_hot(domain_label, 4).float().cuda()
-            DC_label = batch['DC_id']
-            DC_label = torch.nn.functional.one_hot(DC_label, 15).float().cuda()
             batch_len = img.shape[0]
             with torch.no_grad():
                 if config.model_adapt.adapt_method and 'Sup' in config.model_adapt.adapt_method:
-                    if config.model_adapt.Sup_label == 'DC':
-                        output = model(img, DC_label)
-                    elif config.model_adapt.Sup_label == 'Domain':
+                    if config.model_adapt.Sup_label == 'Domain':
                         _, _, res = model(img, domain_label)
-                elif config.model_adapt.adapt_method in ['series_adapters', 'parallel_adapters', 'DASE']:
-                    output = model(img,d)
                 else:
                     _, _, res = model(img)  
                 output = torch.sigmoid(res)
 
-                # calculate loss
-                # assert (output.shape == label.shape)
-                # losses = []
-                # for function in criterion:
-                #     losses.append(function(output, label))
                 loss = criterion(res, label)
                 loss_test_sum += loss*batch_len
 

@@ -12,9 +12,8 @@ import torch.nn.functional as F
 import numpy as np
 
 import sys
-sys.path.append('/ubc/ece/home/ra/grads/siyi/Research/skin_lesion_segmentation/skin-lesion-segmentation-transformer/')
+sys.path.append('/ubc/ece/home/ra/grads/siyi/Research/skin_lesion_segmentation/MDViT/')
 from Models.Hybrid_models.TransFuseFolder.vision_transformer import VisionTransformer, _cfg, VisionTransformer_adapt
-from Models.Transformer.ViT_adapters import ViT_ImageNet
 
 
 __all__ = [
@@ -47,28 +46,6 @@ class DeiT(VisionTransformer):
         x = self.norm(x)
         return x
 
-
-class DeiT_newadapt(ViT_ImageNet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        num_patches = self.patch_embed.num_patches
-        self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 1, self.embed_dim))
-
-    def forward(self, x,d=None):
-        # taken from https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py
-        # with slight modifications to add the dist_token
-        B = x.shape[0]
-        x = self.patch_embed(x)
-        pe = self.pos_embed
-
-        x = x + pe
-        x = self.pos_drop(x)
-
-        for blk in self.blocks:
-            x = blk(x,d='0',size=(14,14))
-
-        x = self.norm(x)
-        return x
 
 
 class DeiT_adapt(VisionTransformer_adapt):
@@ -153,7 +130,8 @@ def deit_small_patch16_224_adapt(pretrained=False, pretrained_folder=None, num_d
     pe = pe.transpose(-1, -2)
     pe = pe.view(pe.shape[0], pe.shape[1], int(np.sqrt(pe.shape[2])), int(np.sqrt(pe.shape[2])))
     # pe = F.interpolate(pe, size=(12, 16), mode='bilinear', align_corners=True)
-    pe = F.interpolate(pe, size=(14, 14), mode='bilinear', align_corners=True)
+    # pe = F.interpolate(pe, size=(14, 14), mode='bilinear', align_corners=True)
+    pe = F.interpolate(pe, size=(16, 16), mode='bilinear', align_corners=True)
     pe = pe.flatten(2)
     pe = pe.transpose(-1, -2)
     model.pos_embed = nn.Parameter(pe)
@@ -178,32 +156,7 @@ def deit_base_patch16_224(pretrained=False, pretrained_folder=None,**kwargs):
     pe = pe.transpose(-1, -2)
     pe = pe.view(pe.shape[0], pe.shape[1], int(np.sqrt(pe.shape[2])), int(np.sqrt(pe.shape[2])))
     # pe = F.interpolate(pe, size=(12, 16), mode='bilinear', align_corners=True)
-    pe = F.interpolate(pe, size=(14, 14), mode='bilinear', align_corners=True)
-    pe = pe.flatten(2)
-    pe = pe.transpose(-1, -2)
-    model.pos_embed = nn.Parameter(pe)
-    model.head = nn.Identity()
-    return model
-
-
-@register_model
-def deit_base_patch16_224_newadapt(pretrained=False, pretrained_folder=None,**kwargs):
-    model = DeiT_newadapt(
-        patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
-        norm_layer=partial(nn.LayerNorm, eps=1e-6), adapt_method='MLP',**kwargs)
-    model.default_cfg = _cfg()
-    # if pretrained:
-    #     ckpt = torch.load('pretrained/deit_base_patch16_224-b5f2ef4d.pth')
-    #     model.load_state_dict(ckpt['model'], strict=False)
-    if pretrained:
-        ckpt = torch.load(pretrained_folder+'/pretrained/deit_base_patch16_224-b5f2ef4d.pth')['model']
-        model = load_pretrain(model, ckpt)
-
-    pe = model.pos_embed[:, 1:, :].detach()
-    pe = pe.transpose(-1, -2)
-    pe = pe.view(pe.shape[0], pe.shape[1], int(np.sqrt(pe.shape[2])), int(np.sqrt(pe.shape[2])))
-    # pe = F.interpolate(pe, size=(12, 16), mode='bilinear', align_corners=True)
-    pe = F.interpolate(pe, size=(14, 14), mode='bilinear', align_corners=True)
+    # pe = F.interpolate(pe, size=(14, 14), mode='bilinear', align_corners=True)
     pe = pe.flatten(2)
     pe = pe.transpose(-1, -2)
     model.pos_embed = nn.Parameter(pe)

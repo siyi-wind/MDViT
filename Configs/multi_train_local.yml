@@ -4,7 +4,7 @@ root_dir: '/ubc/ece/home/ra/grads/siyi/Research/skin_lesion_segmentation'
 pretrained_folder: '/bigdata/siyiplace/data/skin_lesion'
 device: 'cuda'
 # True only train, test one batch
-debug: True
+debug: False
 data:
   # ['isic2018', 'PH2', 'DMF', 'SKD']
   name: ['isic2018', 'PH2', 'DMF', 'SKD']
@@ -13,7 +13,7 @@ data:
   split_ratio: [0.8, 0.2]
   use_val: False  # if false, combine train and val sets to train
   train_aug: True
-  img_size: 224
+  img_size: 256
 train:
   num_workers: 6
   num_epochs: 200
