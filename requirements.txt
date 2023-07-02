@@ -1,4 +1,3 @@
-torchstat
 einops
 tensorboard
 pyyaml

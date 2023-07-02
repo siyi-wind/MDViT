@@ -237,6 +237,7 @@ class UnetDecodingBlockTransformer_M(nn.Module):
         upsample and conv input, concat with skip from encoder
         then conv this combination
         use_res: True means to use residual block for conv_after
+        M means using domain-specific norm
         '''
         super(UnetDecodingBlockTransformer_M, self).__init__()
         self.use_res = use_res
@@ -399,56 +400,6 @@ class MLPDecoder(nn.Module):
    
         return {'seg':out, 'feat':feat} if out_feat else out
 
-
-# 5 encoder features
-# class MLPDecoder(nn.Module):
-#     '''
-#     Imitate SegFormer decoder
-#     '''
-#     def __init__(self, in_channels, out_channel, hidden_channel=256, dropout_ratio=0.1, conv_norm=nn.BatchNorm2d,):
-#         super(MLPDecoder, self).__init__()
-#         self.linear1 = nn.Conv2d(in_channels[0], hidden_channel, 1)  # H/4
-#         self.linear2 = nn.Conv2d(in_channels[1], hidden_channel, 1)  # H/8
-#         self.linear3 = nn.Conv2d(in_channels[2], hidden_channel, 1)  # H/16
-#         self.linear4 = nn.Conv2d(in_channels[3], hidden_channel, 1)  # H/32
-#         self.linear5 = nn.Conv2d(in_channels[4], hidden_channel, 1)  # H/32
-
-#         self.linear_fuse = nn.Sequential(
-#             nn.Conv2d(hidden_channel*5, hidden_channel, 1),
-#             conv_norm(hidden_channel),
-#             nn.ReLU(inplace=True),
-#         )
-#         self.dropout = nn.Dropout2d(dropout_ratio)
-#         self.linear_out = nn.Conv2d(hidden_channel, out_channel, 1)
-        
-
-
-#     def forward(self, features, img_size):
-#         x1, x2, x3, x4, x5 = features   # (B,C,H,W)  H/4, H/8, H/16, H/32
-#         h, w = x1.shape[2:]
-#         x1 = self.linear1(x1)  
-#         x1 = nn.functional.interpolate(x1,size = (h,w), mode = 'bilinear', align_corners=False) # (B,hC,H/4,W/4)
-
-#         x2 = self.linear2(x2)
-#         x2 = nn.functional.interpolate(x2,size = (h,w), mode = 'bilinear', align_corners=False) # (B,hC,H/4,W/4)
-
-#         x3 = self.linear3(x3)
-#         x3 = nn.functional.interpolate(x3,size = (h,w), mode = 'bilinear', align_corners=False) # (B,hC,H/4,W/4)
-
-#         x4 = self.linear4(x4)
-#         x4 = nn.functional.interpolate(x4,size = (h,w), mode = 'bilinear', align_corners=False) # (B,hC,H/4,W/4)
-
-#         x5 = self.linear5(x5)
-#         x5 = nn.functional.interpolate(x5,size = (h,w), mode = 'bilinear', align_corners=False) # (B,hC,H/4,W/4)
-
-#         out = torch.cat([x1, x2, x3, x4, x5], dim=1)  # (B,4*hC,H/4,W/4)
-#         out = self.linear_fuse(out)  # (B,hC,H/4,W/4)
-#         out = self.dropout(out)
-
-#         out = nn.functional.interpolate(out,size = img_size, mode = 'bilinear', align_corners=False) # (B,hC,H,W)
-#         out = self.linear_out(out)
-
-#         return out
 
 
 class MLPDecoderFM(nn.Module):
