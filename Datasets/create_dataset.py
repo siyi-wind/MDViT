@@ -161,7 +161,6 @@ class SkinDataset_csv(torch.utils.data.Dataset):
         else:
             tsf = self.transf(image=img_data.astype('uint8'), mask=label_data.astype('uint8'))
         img_data, label_data = tsf['image'], tsf['mask']
-        mask = label_data
         
         img_data = norm01(img_data)
         label_data = np.expand_dims(label_data, 0)
