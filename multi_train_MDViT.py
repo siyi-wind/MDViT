@@ -433,7 +433,7 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Train experiment')
     parser.add_argument('--exp_name', type=str, default='tmp')
     parser.add_argument('--config_yml', type=str,default='Configs/multi_train_local.yml')
-    parser.add_argument('--model', type=str,default='DeepResUnet')
+    parser.add_argument('--model', type=str,default='MDViT')
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--adapt_method', type=str, default=False)
     parser.add_argument('--dataset', type=str, nargs='+', default='isic2018')

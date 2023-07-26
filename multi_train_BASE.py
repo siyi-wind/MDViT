@@ -85,7 +85,7 @@ def main(config):
         num_heads=[4,4,4,4], projection='interp', attn_drop=0.1, proj_drop=0.1, rel_pos=True, aux_loss=False, maxpool=True)
     elif config.model == 'SwinUnet':
         from Models.Transformer.SwinUnet import SwinUnet
-        model  = SwinUnet(img_size=config.data.img_size)
+        model  = SwinUnet(img_size=config.data.img_size,window_size=8)
 
     total_trainable_params = sum(
                     p.numel() for p in model.parameters() if p.requires_grad)
@@ -404,8 +404,7 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Train experiment')
     parser.add_argument('--exp_name', type=str, default='tmp')
     parser.add_argument('--config_yml', type=str,default='Configs/multi_train_local.yml')
-    parser.add_argument('--model', type=str,default='DeepResUnet')
-    parser.add_argument('--select_patch', action='store_true') # for DeepRUST model. True means using selective patch. If use this means ture
+    parser.add_argument('--model', type=str,default='BASE')
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--adapt_method', type=str, default=False)
     parser.add_argument('--dataset', type=str, nargs='+', default='isic2018')
@@ -414,7 +413,6 @@ if __name__=='__main__':
     config = yaml.load(open(args.config_yml), Loader=yaml.FullLoader)
     config['model'] = args.model
     config['train']['batch_size']=args.batch_size
-    config['select_patch'] = args.select_patch
     config['data']['name'] = args.dataset
     config['model_adapt']['adapt_method']=args.adapt_method
     config['data']['k_fold'] = args.k_fold

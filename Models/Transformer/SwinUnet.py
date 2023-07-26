@@ -838,7 +838,7 @@ if __name__ == '__main__':
     x = torch.randn(5,3,256,256)
     domain_label = torch.randint(0,4,(5,))
     domain_label = torch.nn.functional.one_hot(domain_label, 4).float()
-    model = SwinUnet(img_size=256)
+    model = SwinUnet(img_size=256,window_size=8)
 
     y = model(x)
     print(y.shape)
