@@ -6,7 +6,7 @@
 
 This is a PyTorch implementation for [MDViT: Multi-domain Vision Transformer for Small Medical Image Segmentation Datasets, MICCAI 2023][6].
 
-We also include plenty of comparing models in this repository: SwinUnet, UNETR, UTNet, TransFuse, DASE [8], and USE [7] (Please go to the paper to find the detailed information of these models).
+We also include plenty of comparing models in this repository: SwinUnet, UNETR, UTNet, TransFuse, [DASE][8], and [USE][7] (Please go to the paper to find the detailed information of these models).
 
 If you use this code in your research, please consider citing:
 
