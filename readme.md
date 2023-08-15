@@ -6,6 +6,8 @@
 
 This is a PyTorch implementation for [MDViT: Multi-domain Vision Transformer for Small Medical Image Segmentation Datasets, MICCAI 2023][6].
 
+We also include plenty of comparing models in this repository: SwinUnet, UNETR, UTNet, TransFuse, DASE [8], and USE [7] (Please go to the paper to find the detailed information of these models).
+
 If you use this code in your research, please consider citing:
 
 ```text
@@ -71,3 +73,5 @@ python -u multi_train_TransFuse.py --exp_name test --config_yml Configs/multi_tr
 [4]: https://www.fc.up.pt/addi/ph2%20database.html
 [5]: https://github.com/siyi-wind/MDViT/blob/master/Datasets/create_meta.ipynb
 [6]: https://arxiv.org/abs/2307.02100
+[7]: https://www.sciencedirect.com/science/article/abs/pii/S0925231219309245?casa_token=yJ-Z3vDa4xgAAAAA:6tiTdjmoDLLUX0Y24WJdwp5NThhhkKKhkz2nSCoKuY8G6cdGvjU3q-g879-y0tVrbmYn-kwM3g
+[8]: http://openaccess.thecvf.com/content_CVPR_2019/html/Wang_Towards_Universal_Object_Detection_by_Domain_Attention_CVPR_2019_paper.html
