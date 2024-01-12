@@ -77,7 +77,7 @@ Code is [here][10]
 [3]: https://uwaterloo.ca/vision-image-processing-lab/research-demos/skin-cancer-detection
 [4]: https://www.fc.up.pt/addi/ph2%20database.html
 [5]: https://github.com/siyi-wind/MDViT/blob/master/Datasets/create_meta.ipynb
-[6]: https://arxiv.org/abs/2307.02100
+[6]: https://link.springer.com/chapter/10.1007/978-3-031-43901-8_43
 [7]: https://www.sciencedirect.com/science/article/abs/pii/S0925231219309245?casa_token=yJ-Z3vDa4xgAAAAA:6tiTdjmoDLLUX0Y24WJdwp5NThhhkKKhkz2nSCoKuY8G6cdGvjU3q-g879-y0tVrbmYn-kwM3g
 [8]: http://openaccess.thecvf.com/content_CVPR_2019/html/Wang_Towards_Universal_Object_Detection_by_Domain_Attention_CVPR_2019_paper.html
 [9]: https://link.springer.com/chapter/10.1007/978-3-031-47401-9_3
